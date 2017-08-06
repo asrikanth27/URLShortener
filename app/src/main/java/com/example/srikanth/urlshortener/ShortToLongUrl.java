@@ -1,6 +1,7 @@
 package com.example.srikanth.urlshortener;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,17 +16,16 @@ import retrofit2.Response;
 public class ShortToLongUrl implements Callback<ShortToLongUrlHelper> {
 
     private Context context;
-    private UrlShortenerService service;
-    private MainActivity mainActivity;
     private String resultUrl = "";
+    private DataInterface dataInterface;
 
-    public ShortToLongUrl(Context context, UrlShortenerService service, MainActivity mainActivity){
+    public ShortToLongUrl(Context context, DataInterface dataInterface){
         this.context = context;
-        this.service = service;
-        this.mainActivity = mainActivity;
+        this.dataInterface = dataInterface;
     }
 
     public void performConversion(String url){
+        UrlShortenerService service = UrlShortenerService.retrofit.create(UrlShortenerService.class);
         Call<ShortToLongUrlHelper> call = service.getLongUrl(context.getString(R.string.APIKEY), url);
         call.enqueue(this);
     }
@@ -35,7 +35,7 @@ public class ShortToLongUrl implements Callback<ShortToLongUrlHelper> {
         ShortToLongUrlHelper longUrlHelper = response.body();
         if(longUrlHelper!=null && longUrlHelper.getStatus().equalsIgnoreCase("ok")){
             resultUrl = longUrlHelper.getLongUrl();
-            mainActivity.textView.setText(resultUrl);
+            dataInterface.publishData(resultUrl);
         }
         else{
             Toast.makeText(context, "Null object received", Toast.LENGTH_SHORT).show();

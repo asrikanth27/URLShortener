@@ -21,17 +21,16 @@ import retrofit2.http.Url;
 public class LongToShortUrl implements Callback<LongToShortUrlHelper> {
 
     private Context context;
-    private UrlShortenerService service;
     private String resultUrl = "";
-    private MainActivity mainActivity;
-    public LongToShortUrl(Context context, UrlShortenerService service, MainActivity mainActivity){
+    private DataInterface dataInterface;
+
+    public LongToShortUrl(Context context, DataInterface dataInterface){
         this.context = context;
-        this.service = service;
-        this.mainActivity = mainActivity;
+        this.dataInterface = dataInterface;
     }
 
     public void performConversion(String url){
-        //SendLongUrl u = new SendLongUrl(context.getString(R.string.APIKEY));
+        UrlShortenerService service = UrlShortenerService.retrofit.create(UrlShortenerService.class);
         JsonObject json = new JsonObject();
         json.addProperty("longUrl", url);
         Call<LongToShortUrlHelper> call = service.getShortUrl(json);
@@ -43,7 +42,7 @@ public class LongToShortUrl implements Callback<LongToShortUrlHelper> {
         LongToShortUrlHelper longUrlHelper = response.body();
         if(longUrlHelper!=null){
             resultUrl = longUrlHelper.getId();
-            mainActivity.textView.setText(resultUrl);
+            dataInterface.publishData(resultUrl);
         }
         else{
             Log.i("LongToShortUrl-message", response.message());

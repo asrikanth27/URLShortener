@@ -24,7 +24,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DataInterface {
 
     int flag = 0;
     @BindView(R.id.input_url) EditText editText;
@@ -52,15 +52,14 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.convert)
     public void conv(){
-        UrlShortenerService service = UrlShortenerService.retrofit.create(UrlShortenerService.class);
         if(flag==0) {
             textView.setText("");
-            ShortToLongUrl shortToLongUrl = new ShortToLongUrl(this, service, this);
+            ShortToLongUrl shortToLongUrl = new ShortToLongUrl(this, this);
             shortToLongUrl.performConversion(editText.getText().toString());
         }
         else{
             textView.setText("");
-            LongToShortUrl longToShortUrl = new LongToShortUrl(this, service, this);
+            LongToShortUrl longToShortUrl = new LongToShortUrl(this, this);
             longToShortUrl.performConversion(editText.getText().toString());
         }
     }
@@ -71,5 +70,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+    }
+
+    @Override
+    public void publishData(String resultUrl) {
+        textView.setText(resultUrl);
     }
 }
